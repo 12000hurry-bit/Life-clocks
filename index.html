@@ -335,11 +335,19 @@
 
   /* オーバーフローしたマイルストーンのリスト表示 */
   .overflow-notice {
-    font-size: 11px; color: #fbbf24; text-align: center;
+    font-size: 11px; color: #94a3b8; text-align: center;
     padding: 6px; display: none;
+    line-height: 2;
   }
   .overflow-notice.show { display: block; }
-
+  .overflow-notice-label { color: #64748b; margin-right: 2px; }
+  .overflow-notice-item {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin: 0 6px; white-space: nowrap;
+  }
+  .overflow-notice-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
+  }
   /* フォームエラーメッセージ */
   .form-error {
     font-size: 12px; color: #f87171;
@@ -901,7 +909,17 @@ let examCurrentPresetKey='week';
 let examDisplayMode='segment'; // 'segment'=連続区切り方式, 'ring'=階層リング方式
 let examPeriodStart=null, examPeriodEnd=null, examPeriodName='';
 
-// 文字盤を月表示にする際の、各言語ごとの月名（スペースが限られるため短い表記）
+// 週表示の目盛り用：各言語の曜日名（短縮表記）。getDay()の0=日曜始まりに合わせる
+const EXAM_WEEKDAY_NAMES = {
+  en: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+  ja: ['日','月','火','水','木','金','土'],
+  ko: ['일','월','화','수','목','금','토'],
+  zh: ['日','一','二','三','四','五','六'],
+  hi: ['रवि','सोम','मंगल','बुध','गुरु','शुक्र','शनि'],
+  es: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+  fr: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
+  pt: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+};
 const EXAM_MONTH_NAMES = {
   en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
   ja: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
@@ -1750,19 +1768,30 @@ function examFlashClockCenter(){
 // ── 文字盤に描ききれなかったマイルストーンをテキストで通知 ──
 // （狭いセグメント/リングにラベルを無理に押し込んで読めなくするより、
 //   下部に「他にN件: A, B, C」と出す方が実用的）
-function examUpdateOverflowNotice(names){
+function examUpdateOverflowNotice(items){
   const el=document.getElementById('exam-overflowNotice');
   if(!el) return;
-  if(!names || names.length===0){
+  if(!items || items.length===0){
     el.classList.remove('show');
-    el.textContent='';
+    el.innerHTML='';
     return;
   }
   const label = examL.overflowPrefix || 'Also:';
-  const shown = names.slice(0,4).join(', ');
-  const extra = names.length>4 ? ` +${names.length-4}` : '';
-  el.textContent = `${label} ${shown}${extra}`;
+  const shown = items.slice(0,6);
+  const extra = items.length>6 ? items.length-6 : 0;
+  // クロック上の色付きマーカーと同じ色の丸印を添えることで、
+  // 「この色は何のマイルストーンか」が一目で分かるようにする
+  const itemsHtml = shown.map(it =>
+    `<span class="overflow-notice-item"><span class="overflow-notice-dot" style="background:${it.color}"></span>${escapeHtmlExam(it.name)}</span>`
+  ).join('');
+  el.innerHTML = `<span class="overflow-notice-label">${label}</span>${itemsHtml}${extra ? ` <span class="overflow-notice-item">+${extra}</span>` : ''}`;
   el.classList.add('show');
+}
+
+function escapeHtmlExam(str){
+  const d=document.createElement('div');
+  d.textContent=str;
+  return d.innerHTML;
 }
 
 // ライト/ダークモードは全タブ共通の toggleGlobalTheme() / loadGlobalTheme()（index.html側）に一本化。
@@ -1907,7 +1936,7 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
     } else {
-      overflowLabels.push(ev.name);
+      overflowLabels.push({name: ev.name, color: ev.color});
     }
 
     const [emx,emy]=examPolar(midR,segEndDeg);
@@ -1951,7 +1980,7 @@ function examDrawMilestonesRing(now, now0, nowDeg){
   sortedEvents.forEach((ev,i)=>{
     const outerR=outerMax-i*(ringH+gap);
     const innerR=outerR-ringH;
-    if(innerR<innerMin){ overflowLabels.push(ev.name); return; }
+    if(innerR<innerMin){ overflowLabels.push({name: ev.name, color: ev.color}); return; }
 
     const targetDeg=examDateToDeg(ev.dateMs);
     const startA=(nowDeg-90)*Math.PI/180;
@@ -2067,7 +2096,7 @@ function examDraw(){
       }
 
       // ラベル（長期間は経過月数、短期間は経過日数）
-      const [lx,ly]=examPolar(476,deg);
+      const [lx,ly]=examPolar(460,deg);
       examCtx.save();
       examCtx.font='bold 20px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif';
       examCtx.fillStyle=T.tickLabel;
@@ -2079,8 +2108,17 @@ function examDraw(){
         const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
         const monthNames = EXAM_MONTH_NAMES[examLang] || EXAM_MONTH_NAMES.en;
         label = monthNames[tickDate.getMonth()];
+      } else if(totalDays<=7){
+        // 週表示：各目盛りは実際の曜日に対応する
+        const dayAtTick = i/divisions*totalDays;
+        const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
+        const weekdayNames = EXAM_WEEKDAY_NAMES[examLang] || EXAM_WEEKDAY_NAMES.en;
+        label = weekdayNames[tickDate.getDay()];
       } else {
-        label = `D${Math.round(i/divisions*totalDays)}`;
+        // 週より長いが月表示にはまだ満たない期間：実際の日付（日）を表示
+        const dayAtTick = i/divisions*totalDays;
+        const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
+        label = String(tickDate.getDate());
       }
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
