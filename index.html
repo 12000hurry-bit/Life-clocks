@@ -113,6 +113,16 @@
     font-weight: 300; color: #e2e8f0; letter-spacing: 0.05em;
   }
   .center-label { font-size: 12px; color: #64748b; margin-top: 2px; letter-spacing: 0.05em; }
+  /* 「今日」を意識できるよう、日付を目立つ形で表示する */
+  .today-display {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 6px 16px;
+    background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.35);
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700;
+    color: #a5b4fc; letter-spacing: 0.03em;
+  }
+  body.light-mode .today-display { background: rgba(99,102,241,0.08); color: #4338ca; }
 
   /* 期間設定パネル */
   .period-box {
@@ -506,6 +516,7 @@
 <div class="center-display">
   <div class="center-num" id="exam-centerNum">--</div>
   <div class="center-label" id="exam-centerLabel">Set a period below</div>
+  <div class="today-display" id="exam-todayDisplay"></div>
 </div>
 
 <canvas id="exam-c" width="960" height="960"></canvas>
@@ -957,6 +968,11 @@ const EXAM_WEEKDAY_NAMES = {
   pt: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
 };
 // 月間表示（週より長く、月表示にはまだ満たない期間）の日付に添える単位
+// 「今日」表示用の見出し語
+const EXAM_TODAY_LABEL = {
+  en: 'Today', ja: '今日', ko: '오늘', zh: '今天', hi: 'आज', es: 'Hoy', fr: "Aujourd'hui", pt: 'Hoje',
+};
+
 const EXAM_DAY_UNIT = {
   en: '', ja: '日', ko: '일', zh: '日', hi: '', es: '', fr: '', pt: '',
 };
@@ -1881,6 +1897,17 @@ function examGetElapsedDays(now){
 
 function examUpdateCenterDisplay(){
   const now=new Date(); now.setHours(0,0,0,0);
+
+  // 「今日」を意識できるよう、常に目立つ位置に今日の日付を表示する
+  const todayEl=document.getElementById('exam-todayDisplay');
+  if(todayEl){
+    const todayLabel = EXAM_TODAY_LABEL[examLang] || EXAM_TODAY_LABEL.en;
+    const monthName = (EXAM_MONTH_NAMES[examLang]||EXAM_MONTH_NAMES.en)[now.getMonth()];
+    const weekdayName = (EXAM_WEEKDAY_NAMES[examLang]||EXAM_WEEKDAY_NAMES.en)[now.getDay()];
+    const dayUnit = EXAM_DAY_UNIT[examLang] || '';
+    todayEl.textContent = `${todayLabel}: ${monthName} ${now.getDate()}${dayUnit} (${weekdayName})`;
+  }
+
   if(!examPeriodStart||!examPeriodEnd){
     document.getElementById('exam-centerNum').textContent='--';
     document.getElementById('exam-centerLabel').textContent=examL.centerLabelSet;
@@ -2167,7 +2194,7 @@ function examDraw(){
         const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
         const weekdayNames = EXAM_WEEKDAY_NAMES[examLang] || EXAM_WEEKDAY_NAMES.en;
         const wd = weekdayNames[tickDate.getDay()];
-        label = /^[a-zA-Z]/.test(wd) ? `${wd} ${tickDate.getDate()}` : `${wd}${tickDate.getDate()}`;
+        label = /^[a-zA-Z]/.test(wd) ? `${tickDate.getDate()} ${wd}` : `${tickDate.getDate()}${wd}`;
       } else {
         // 週より長いが月表示にはまだ満たない期間：実際の日付（日）＋言語ごとの単位を表示
         const dayAtTick = i/divisions*totalDays;
