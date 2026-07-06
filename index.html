@@ -153,7 +153,7 @@
     padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
   }
   .event-panel-title { font-size: 11px; letter-spacing: 0.2em; color: #475569; text-transform: uppercase; }
-  .event-add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .event-add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
   .event-add-row input {
     background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
     color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 12px;
@@ -956,6 +956,11 @@ const EXAM_WEEKDAY_NAMES = {
   fr: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
   pt: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
 };
+// 月間表示（週より長く、月表示にはまだ満たない期間）の日付に添える単位
+const EXAM_DAY_UNIT = {
+  en: '', ja: '日', ko: '일', zh: '日', hi: '', es: '', fr: '', pt: '',
+};
+
 const EXAM_MONTH_NAMES = {
   en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
   ja: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
@@ -1891,7 +1896,7 @@ function examUpdateCenterDisplay(){
 // ── マイルストーン描画：連続セグメント方式 ──
 // 「今日→予定1」「予定1→予定2」…と隙間なく単一リングを区切って色分けする
 function examDrawMilestonesSegment(now, now0, nowDeg){
-  const segOuter=286, segInner=140;
+  const segOuter=286, segInner=100;
   const now0forSort=new Date(now); now0forSort.setHours(0,0,0,0);
   const overflowLabels = []; // ラベルを描画しきれなかったマイルストーン名を集める
 
@@ -2009,7 +2014,7 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
 // ── マイルストーン描画：階層リング方式 ──
 // 各予定を独立したリングとして重ねる（残り日数が短いものほど外側）
 function examDrawMilestonesRing(now, now0, nowDeg){
-  const outerMax=286, innerMin=40;
+  const outerMax=286, innerMin=25;
   const ringH=Math.min(70,Math.max(38,Math.floor((outerMax-innerMin)/examEvents.length)-6));
   const gap=6;
   const overflowLabels = []; // リング幅が足りず描画できなかったマイルストーン名
@@ -2141,6 +2146,9 @@ function examDraw(){
       }
 
       // ラベル（長期間は経過月数、短期間は経過日数）
+      // 最後の目盛り（i===divisions、角度360°）は最初の目盛り（0°）と同じ位置になるため、
+      // ラベルが重なって読めなくなる。目盛り線だけ描いてラベルは省略する。
+      if(i<divisions){
       const [lx,ly]=examPolar(460,deg);
       examCtx.save();
       examCtx.font='bold 20px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif';
@@ -2154,19 +2162,22 @@ function examDraw(){
         const monthNames = EXAM_MONTH_NAMES[examLang] || EXAM_MONTH_NAMES.en;
         label = monthNames[tickDate.getMonth()];
       } else if(totalDays<=7){
-        // 週表示：各目盛りは実際の曜日に対応する
+        // 週表示：曜日 + 実際の日付（日）の両方を表示する
         const dayAtTick = i/divisions*totalDays;
         const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
         const weekdayNames = EXAM_WEEKDAY_NAMES[examLang] || EXAM_WEEKDAY_NAMES.en;
-        label = weekdayNames[tickDate.getDay()];
+        const wd = weekdayNames[tickDate.getDay()];
+        label = /^[a-zA-Z]/.test(wd) ? `${wd} ${tickDate.getDate()}` : `${wd}${tickDate.getDate()}`;
       } else {
-        // 週より長いが月表示にはまだ満たない期間：実際の日付（日）を表示
+        // 週より長いが月表示にはまだ満たない期間：実際の日付（日）＋言語ごとの単位を表示
         const dayAtTick = i/divisions*totalDays;
         const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
-        label = String(tickDate.getDate());
+        const dayUnit = EXAM_DAY_UNIT[examLang] || '';
+        label = `${tickDate.getDate()}${dayUnit}`;
       }
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
+      }
     }
   } else {
     // 期間未設定時は12分割の汎用目盛り
