@@ -149,6 +149,13 @@
     color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 12px;
     padding: 8px 10px; outline: none; width: 100%;
   }
+  /* 日付入力欄：初見でも「これは何の日付か」が分かるよう、上に小さな見出しを添える */
+  .milestone-date-field { display: flex; flex-direction: column; gap: 3px; }
+  .milestone-date-caption {
+    font-size: 9px; letter-spacing: 0.08em; color: #475569;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  body.light-mode .milestone-date-caption { color: #64748b; }
   .add-btn { grid-column: 1/-1; background: #6366f1; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 700; padding: 9px; cursor: pointer; transition: opacity .2s; }
   .add-btn:hover { opacity: .8; }
   .event-list { display: flex; flex-direction: column; gap: 7px; }
@@ -507,7 +514,10 @@
   <div class="event-panel-title" id="exam-eventPanelTitle">Milestones</div>
   <div class="event-add-row">
     <input type="text" id="exam-newEventName" placeholder="Milestone name" maxlength="24">
-    <input type="date" id="exam-newEventDate">
+    <div class="milestone-date-field">
+      <span class="milestone-date-caption" id="exam-newEventDateLabel">Milestone date</span>
+      <input type="date" id="exam-newEventDate">
+    </div>
   </div>
   <div class="color-picker-label" id="exam-newColorLabel">Color</div>
   <div class="color-picker-row" id="exam-newEventColorRow"></div>
@@ -631,7 +641,7 @@ const examLANGS = {
     presetPregnancy:'Pregnancy', presetCustom:'Custom',
     periodBoxLabel:'Custom Period', periodSetBtn:'Set',
     namePH:'Name (e.g. Diet, Sprint)', startPH:'Start', endPH:'End',
-    eventPanelTitle:'Milestones', addBtn:'+ Add', milestonePH:'Milestone name',
+    eventPanelTitle:'Milestones', addBtn:'+ Add', milestonePH:'Milestone name', milestoneDateLabel:'Milestone date',
     daysLeft:'days left', daysAgo:'days ago', today:'Today!',
     centerLabelSet:'Set a period below',
     remaining:(d,total)=>`${d} / ${total} days`,
@@ -662,7 +672,7 @@ const examLANGS = {
     presetPregnancy:'妊娠期間', presetCustom:'カスタム',
     periodBoxLabel:'カスタム期間', periodSetBtn:'設定',
     namePH:'名前（例：ダイエット、締め切り）', startPH:'開始日', endPH:'終了日',
-    eventPanelTitle:'マイルストーン', addBtn:'追加', milestonePH:'マイルストーン名',
+    eventPanelTitle:'マイルストーン', addBtn:'追加', milestonePH:'マイルストーン名', milestoneDateLabel:'達成日',
     daysLeft:'日後', daysAgo:'日前', today:'今日！',
     centerLabelSet:'下で期間を設定してください',
     remaining:(d,total)=>`${d} / ${total} 日`,
@@ -693,7 +703,7 @@ const examLANGS = {
     presetPregnancy:'임신 기간', presetCustom:'사용자 지정',
     periodBoxLabel:'사용자 지정 기간', periodSetBtn:'설정',
     namePH:'이름 (예: 다이어트, 마감)', startPH:'시작일', endPH:'종료일',
-    eventPanelTitle:'마일스톤', addBtn:'추가', milestonePH:'마일스톤 이름',
+    eventPanelTitle:'마일스톤', addBtn:'추가', milestonePH:'마일스톤 이름', milestoneDateLabel:'목표 날짜',
     daysLeft:'일 남음', daysAgo:'일 전', today:'오늘!',
     centerLabelSet:'아래에서 기간을 설정하세요',
     remaining:(d,total)=>`${d} / ${total} 일`,
@@ -724,7 +734,7 @@ const examLANGS = {
     presetPregnancy:'孕期', presetCustom:'自定义',
     periodBoxLabel:'自定义周期', periodSetBtn:'设置',
     namePH:'名称（例：减肥、截止日期）', startPH:'开始日期', endPH:'结束日期',
-    eventPanelTitle:'里程碑', addBtn:'添加', milestonePH:'里程碑名称',
+    eventPanelTitle:'里程碑', addBtn:'添加', milestonePH:'里程碑名称', milestoneDateLabel:'目标日期',
     daysLeft:'天后', daysAgo:'天前', today:'今天！',
     centerLabelSet:'请在下方设置周期',
     remaining:(d,total)=>`${d} / ${total} 天`,
@@ -755,7 +765,7 @@ const examLANGS = {
     presetPregnancy:'गर्भावस्था', presetCustom:'कस्टम',
     periodBoxLabel:'कस्टम अवधि', periodSetBtn:'सेट करें',
     namePH:'नाम (जैसे: डाइट, समय सीमा)', startPH:'शुरुआत', endPH:'समाप्ति',
-    eventPanelTitle:'मील के पत्थर', addBtn:'जोड़ें', milestonePH:'मील के पत्थर का नाम',
+    eventPanelTitle:'मील के पत्थर', addBtn:'जोड़ें', milestonePH:'मील के पत्थर का नाम', milestoneDateLabel:'लक्ष्य तिथि',
     daysLeft:'दिन बाकी', daysAgo:'दिन पहले', today:'आज!',
     centerLabelSet:'नीचे अवधि सेट करें',
     remaining:(d,total)=>`${d} / ${total} दिन`,
@@ -786,7 +796,7 @@ const examLANGS = {
     presetPregnancy:'Embarazo', presetCustom:'Personalizado',
     periodBoxLabel:'Período Personalizado', periodSetBtn:'Establecer',
     namePH:'Nombre (ej: Dieta, Plazo)', startPH:'Inicio', endPH:'Fin',
-    eventPanelTitle:'Hitos', addBtn:'+ Agregar', milestonePH:'Nombre del hito',
+    eventPanelTitle:'Hitos', addBtn:'+ Agregar', milestonePH:'Nombre del hito', milestoneDateLabel:'Fecha del hito',
     daysLeft:'días', daysAgo:'días atrás', today:'¡Hoy!',
     centerLabelSet:'Establece un período abajo',
     remaining:(d,total)=>`${d} / ${total} días`,
@@ -817,7 +827,7 @@ const examLANGS = {
     presetPregnancy:'Grossesse', presetCustom:'Personnalisé',
     periodBoxLabel:'Période Personnalisée', periodSetBtn:'Définir',
     namePH:'Nom (ex: Régime, Échéance)', startPH:'Début', endPH:'Fin',
-    eventPanelTitle:'Jalons', addBtn:'+ Ajouter', milestonePH:'Nom du jalon',
+    eventPanelTitle:'Jalons', addBtn:'+ Ajouter', milestonePH:'Nom du jalon', milestoneDateLabel:'Date du jalon',
     daysLeft:'jours', daysAgo:'jours passés', today:"Aujourd'hui!",
     centerLabelSet:'Définissez une période ci-dessous',
     remaining:(d,total)=>`${d} / ${total} jours`,
@@ -848,7 +858,7 @@ const examLANGS = {
     presetPregnancy:'Gravidez', presetCustom:'Personalizado',
     periodBoxLabel:'Período Personalizado', periodSetBtn:'Definir',
     namePH:'Nome (ex: Dieta, Prazo)', startPH:'Início', endPH:'Fim',
-    eventPanelTitle:'Marcos', addBtn:'+ Adicionar', milestonePH:'Nome do marco',
+    eventPanelTitle:'Marcos', addBtn:'+ Adicionar', milestonePH:'Nome do marco', milestoneDateLabel:'Data do marco',
     daysLeft:'dias', daysAgo:'dias atrás', today:'Hoje!',
     centerLabelSet:'Defina um período abaixo',
     remaining:(d,total)=>`${d} / ${total} dias`,
@@ -967,6 +977,8 @@ function examSetLang(code){
   document.getElementById('exam-eventPanelTitle').textContent=examL.eventPanelTitle;
   document.getElementById('exam-addBtn').textContent=examL.addBtn;
   document.getElementById('exam-newEventName').placeholder=examL.milestonePH;
+  const dateLbl=document.getElementById('exam-newEventDateLabel');
+  if(dateLbl) dateLbl.textContent=examL.milestoneDateLabel||'Milestone date';
   document.getElementById('exam-footer').textContent=examL.footer;
   const vmSegEl=document.getElementById('exam-vmSegLabel');
   const vmRingEl=document.getElementById('exam-vmRingLabel');
@@ -1928,10 +1940,12 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
       const maxC=Math.max(5,Math.floor(segSpan/6));
       const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
-      // 背景色に関わらず読めるよう、濃い輪郭付きの白文字にする
-      examCtx.lineWidth=Math.max(3,fontSize/5);
-      examCtx.strokeStyle='rgba(0,0,0,0.85)';
-      examCtx.strokeText(label,lx,ly);
+      // 背景色（マイルストーンの色）が明るい場合でも確実に読めるよう、
+      // 文字の後ろに濃い不透明の帯を敷いてから白文字を描画する
+      const chipW=examCtx.measureText(label).width + fontSize*1.0;
+      const chipH=fontSize*1.6;
+      examCtx.fillStyle='#050609';
+      examCtx.fillRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
       examCtx.fillStyle='#ffffff';
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
@@ -2028,11 +2042,12 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     examCtx.textAlign='center'; examCtx.textBaseline='middle';
     const maxC=Math.max(5,Math.floor(ringH/fontSize*2.4));
     const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
-    // 背景色に関わらず読めるよう、濃い輪郭付きの白文字にする（過去分は少し薄く）
+    // 背景色（マイルストーンの色）に関わらず読めるよう、文字の後ろに濃い不透明の帯を敷く（過去分は少し薄く）
     examCtx.globalAlpha=isPast?0.6:1;
-    examCtx.lineWidth=Math.max(3,fontSize/5);
-    examCtx.strokeStyle='rgba(0,0,0,0.85)';
-    examCtx.strokeText(label,lx,ly);
+    const chipW=examCtx.measureText(label).width + fontSize*1.0;
+    const chipH=fontSize*1.6;
+    examCtx.fillStyle='#050609';
+    examCtx.fillRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
     examCtx.fillStyle='#ffffff';
     examCtx.fillText(label,lx,ly);
     examCtx.restore();
