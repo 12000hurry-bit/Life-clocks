@@ -1808,7 +1808,7 @@ function examUpdateCenterDisplay(){
 // ── マイルストーン描画：連続セグメント方式 ──
 // 「今日→予定1」「予定1→予定2」…と隙間なく単一リングを区切って色分けする
 function examDrawMilestonesSegment(now, now0, nowDeg){
-  const segOuter=278, segInner=180;
+  const segOuter=286, segInner=140;
   const now0forSort=new Date(now); now0forSort.setHours(0,0,0,0);
   const overflowLabels = []; // ラベルを描画しきれなかったマイルストーン名を集める
 
@@ -1879,16 +1879,19 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
 
     // セグメントが狭すぎる場合はラベルを描画しない
     // （無理に縮小して読めない文字を出すより、下部のオーバーフローリストに委ねる）
-    const MIN_SPAN_FOR_LABEL = 10; // これ未満の角度幅はラベル省略
+    const MIN_SPAN_FOR_LABEL = 7; // これ未満の角度幅はラベル省略
     if(segSpan >= MIN_SPAN_FOR_LABEL){
-      const fontSize=Math.max(11,Math.min(17,segSpan/6));
+      const fontSize=Math.max(13,Math.min(22,segSpan/5));
       examCtx.save();
       examCtx.font=`bold ${fontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
-      examCtx.fillStyle=`rgba(${rv},${gv},${bv},1)`;
-      examCtx.shadowColor='rgba(0,0,0,1)'; examCtx.shadowBlur=6;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
-      const maxC=Math.max(4,Math.floor(segSpan/8));
+      const maxC=Math.max(5,Math.floor(segSpan/6));
       const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
+      // 背景色に関わらず読めるよう、濃い輪郭付きの白文字にする
+      examCtx.lineWidth=Math.max(3,fontSize/5);
+      examCtx.strokeStyle='rgba(0,0,0,0.85)';
+      examCtx.strokeText(label,lx,ly);
+      examCtx.fillStyle='#ffffff';
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
     } else {
@@ -1921,7 +1924,7 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
 // ── マイルストーン描画：階層リング方式 ──
 // 各予定を独立したリングとして重ねる（残り日数が短いものほど外側）
 function examDrawMilestonesRing(now, now0, nowDeg){
-  const outerMax=278, innerMin=48;
+  const outerMax=286, innerMin=40;
   const ringH=Math.min(70,Math.max(38,Math.floor((outerMax-innerMin)/examEvents.length)-6));
   const gap=6;
   const overflowLabels = []; // リング幅が足りず描画できなかったマイルストーン名
@@ -1978,14 +1981,18 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     const midR=(outerR+innerR)/2;
     const midDeg=(nowDeg+targetDeg)/2;
     const [lx,ly]=examPolar(midR,midDeg);
-    const fontSize=Math.max(11,Math.min(16,ringH/4));
+    const fontSize=Math.max(13,Math.min(20,ringH/3.2));
     examCtx.save();
     examCtx.font=`bold ${fontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
-    examCtx.fillStyle=`rgba(${rv},${gv},${bv},${isPast?0.5:1})`;
-    examCtx.shadowColor='rgba(0,0,0,1)'; examCtx.shadowBlur=6;
     examCtx.textAlign='center'; examCtx.textBaseline='middle';
-    const maxC=Math.max(5,Math.floor(ringH/fontSize*2.2));
+    const maxC=Math.max(5,Math.floor(ringH/fontSize*2.4));
     const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
+    // 背景色に関わらず読めるよう、濃い輪郭付きの白文字にする（過去分は少し薄く）
+    examCtx.globalAlpha=isPast?0.6:1;
+    examCtx.lineWidth=Math.max(3,fontSize/5);
+    examCtx.strokeStyle='rgba(0,0,0,0.85)';
+    examCtx.strokeText(label,lx,ly);
+    examCtx.fillStyle='#ffffff';
     examCtx.fillText(label,lx,ly);
     examCtx.restore();
 
@@ -2020,12 +2027,12 @@ function examDraw(){
   const totalDays = hasPeriod ? examGetTotalDays() : 0;
 
   // ── 外周：期間の目盛り（動的分割） ──
-  // 総日数に応じて分割数を決定（週=7分割、月=約10分割、年=12分割など）
+  // 短い期間（週・月）は日数表示、長い期間（四半期・年・長期カスタム）は月表示にする
+  const useMonthLabels = totalDays > 35;
   let divisions;
-  if(totalDays<=7) divisions=7;
-  else if(totalDays<=31) divisions=10;
-  else if(totalDays<=100) divisions=10;
-  else if(totalDays<=400) divisions=12;
+  if(useMonthLabels){
+    divisions = Math.max(2, Math.min(24, Math.round(totalDays/30.44)));
+  } else if(totalDays<=7) divisions=7;
   else divisions=10;
 
   if(hasPeriod){
@@ -2047,15 +2054,15 @@ function examDraw(){
         }
       }
 
-      // ラベル（経過日数 or 日付）
-      const dayAtTick=Math.round(i/divisions*totalDays);
+      // ラベル（長期間は経過月数、短期間は経過日数）
       const [lx,ly]=examPolar(476,deg);
       examCtx.save();
       examCtx.font='bold 20px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif';
       examCtx.fillStyle=T.tickLabel;
       examCtx.shadowColor=T.tickLabelGlow; examCtx.shadowBlur=6;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
-      examCtx.fillText(`D${dayAtTick}`,lx,ly);
+      const label = useMonthLabels ? `M${i}` : `D${Math.round(i/divisions*totalDays)}`;
+      examCtx.fillText(label,lx,ly);
       examCtx.restore();
     }
   } else {
