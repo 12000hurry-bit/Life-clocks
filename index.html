@@ -121,10 +121,20 @@
     padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
   }
   .period-box label { font-size: 11px; letter-spacing: 0.2em; color: #475569; text-transform: uppercase; }
-  .period-row { display: flex; gap: 8px; }
-  .period-row input[type="text"],
-  .period-row input[type="date"] {
+  .period-row { display: flex; gap: 8px; align-items: flex-end; }
+  .period-row input[type="text"] {
     flex: 1; background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
+    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
+    padding: 8px 10px; outline: none; transition: border-color .2s;
+  }
+  .period-date-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .period-date-caption {
+    font-size: 9px; letter-spacing: 0.08em; color: #475569;
+    text-transform: uppercase; white-space: nowrap;
+  }
+  body.light-mode .period-date-caption { color: #64748b; }
+  .period-row input[type="date"] {
+    width: 100%; background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
     color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
     padding: 8px 10px; outline: none; transition: border-color .2s;
   }
@@ -432,6 +442,16 @@
   body.light-mode .period-row input, body.light-mode .event-add-row input {
     background: #f1f5f9; border-color: #e2e8f0; color: #334155;
   }
+  /* .event-name と .event-days は個別にcolorを指定しているため、
+     親のcolor指定だけでは上書きされず、ライトモードでも暗いモード用の
+     薄い文字色のままになってしまっていた（明るい背景に薄い文字＝読めない）。
+     ここで明示的に上書きする。 */
+  body.light-mode .event-name, body.light-mode .event-days {
+    color: #1e293b;
+  }
+  body.light-mode .event-meta, body.light-mode .event-days small {
+    color: #64748b;
+  }
   body.light-mode .center-num { color: #1e293b; }
   body.light-mode footer { color: #cbd5e1; }
 
@@ -502,8 +522,14 @@
     <input type="text" id="exam-periodName" placeholder="Name (e.g. Diet, Sprint)" maxlength="24">
   </div>
   <div class="period-row">
-    <input type="date" id="exam-periodStart" onchange="examOnManualPeriodEdit()">
-    <input type="date" id="exam-periodEnd" onchange="examOnManualPeriodEdit()">
+    <div class="period-date-field">
+      <span class="period-date-caption" id="exam-periodStartLabel">Start</span>
+      <input type="date" id="exam-periodStart" onchange="examOnManualPeriodEdit()">
+    </div>
+    <div class="period-date-field">
+      <span class="period-date-caption" id="exam-periodEndLabel">End</span>
+      <input type="date" id="exam-periodEnd" onchange="examOnManualPeriodEdit()">
+    </div>
     <button onclick="examSetCustomPeriod()" id="exam-periodSetBtn">Set</button>
   </div>
   <div class="form-error" id="exam-periodError"></div>
@@ -639,7 +665,7 @@ const examLANGS = {
   en: {
     presetWeek:'Week', presetMonth:'Month', presetQuarter:'3 Months', presetYear:'Year',
     presetPregnancy:'Pregnancy', presetCustom:'Custom',
-    periodBoxLabel:'Custom Period', periodSetBtn:'Set',
+    periodBoxLabel:'Custom Period', periodSetBtn:'Set', periodStartLabel:'Start', periodEndLabel:'End',
     namePH:'Name (e.g. Diet, Sprint)', startPH:'Start', endPH:'End',
     eventPanelTitle:'Milestones', addBtn:'+ Add', milestonePH:'Milestone name', milestoneDateLabel:'Milestone date',
     daysLeft:'days left', daysAgo:'days ago', today:'Today!',
@@ -670,7 +696,7 @@ const examLANGS = {
   ja: {
     presetWeek:'週間', presetMonth:'月間', presetQuarter:'3ヶ月', presetYear:'年間',
     presetPregnancy:'妊娠期間', presetCustom:'カスタム',
-    periodBoxLabel:'カスタム期間', periodSetBtn:'設定',
+    periodBoxLabel:'カスタム期間', periodSetBtn:'設定', periodStartLabel:'開始日', periodEndLabel:'終了日',
     namePH:'名前（例：ダイエット、締め切り）', startPH:'開始日', endPH:'終了日',
     eventPanelTitle:'マイルストーン', addBtn:'追加', milestonePH:'マイルストーン名', milestoneDateLabel:'達成日',
     daysLeft:'日後', daysAgo:'日前', today:'今日！',
@@ -701,7 +727,7 @@ const examLANGS = {
   ko: {
     presetWeek:'주간', presetMonth:'월간', presetQuarter:'분기', presetYear:'연간',
     presetPregnancy:'임신 기간', presetCustom:'사용자 지정',
-    periodBoxLabel:'사용자 지정 기간', periodSetBtn:'설정',
+    periodBoxLabel:'사용자 지정 기간', periodSetBtn:'설정', periodStartLabel:'시작일', periodEndLabel:'종료일',
     namePH:'이름 (예: 다이어트, 마감)', startPH:'시작일', endPH:'종료일',
     eventPanelTitle:'마일스톤', addBtn:'추가', milestonePH:'마일스톤 이름', milestoneDateLabel:'목표 날짜',
     daysLeft:'일 남음', daysAgo:'일 전', today:'오늘!',
@@ -732,7 +758,7 @@ const examLANGS = {
   zh: {
     presetWeek:'周', presetMonth:'月', presetQuarter:'季度', presetYear:'年',
     presetPregnancy:'孕期', presetCustom:'自定义',
-    periodBoxLabel:'自定义周期', periodSetBtn:'设置',
+    periodBoxLabel:'自定义周期', periodSetBtn:'设置', periodStartLabel:'开始日期', periodEndLabel:'结束日期',
     namePH:'名称（例：减肥、截止日期）', startPH:'开始日期', endPH:'结束日期',
     eventPanelTitle:'里程碑', addBtn:'添加', milestonePH:'里程碑名称', milestoneDateLabel:'目标日期',
     daysLeft:'天后', daysAgo:'天前', today:'今天！',
@@ -763,7 +789,7 @@ const examLANGS = {
   hi: {
     presetWeek:'सप्ताह', presetMonth:'माह', presetQuarter:'तिमाही', presetYear:'वर्ष',
     presetPregnancy:'गर्भावस्था', presetCustom:'कस्टम',
-    periodBoxLabel:'कस्टम अवधि', periodSetBtn:'सेट करें',
+    periodBoxLabel:'कस्टम अवधि', periodSetBtn:'सेट करें', periodStartLabel:'शुरुआत', periodEndLabel:'समाप्ति',
     namePH:'नाम (जैसे: डाइट, समय सीमा)', startPH:'शुरुआत', endPH:'समाप्ति',
     eventPanelTitle:'मील के पत्थर', addBtn:'जोड़ें', milestonePH:'मील के पत्थर का नाम', milestoneDateLabel:'लक्ष्य तिथि',
     daysLeft:'दिन बाकी', daysAgo:'दिन पहले', today:'आज!',
@@ -794,7 +820,7 @@ const examLANGS = {
   es: {
     presetWeek:'Semana', presetMonth:'Mes', presetQuarter:'Trimestre', presetYear:'Año',
     presetPregnancy:'Embarazo', presetCustom:'Personalizado',
-    periodBoxLabel:'Período Personalizado', periodSetBtn:'Establecer',
+    periodBoxLabel:'Período Personalizado', periodSetBtn:'Establecer', periodStartLabel:'Inicio', periodEndLabel:'Fin',
     namePH:'Nombre (ej: Dieta, Plazo)', startPH:'Inicio', endPH:'Fin',
     eventPanelTitle:'Hitos', addBtn:'+ Agregar', milestonePH:'Nombre del hito', milestoneDateLabel:'Fecha del hito',
     daysLeft:'días', daysAgo:'días atrás', today:'¡Hoy!',
@@ -825,7 +851,7 @@ const examLANGS = {
   fr: {
     presetWeek:'Semaine', presetMonth:'Mois', presetQuarter:'Trimestre', presetYear:'Année',
     presetPregnancy:'Grossesse', presetCustom:'Personnalisé',
-    periodBoxLabel:'Période Personnalisée', periodSetBtn:'Définir',
+    periodBoxLabel:'Période Personnalisée', periodSetBtn:'Définir', periodStartLabel:'Début', periodEndLabel:'Fin',
     namePH:'Nom (ex: Régime, Échéance)', startPH:'Début', endPH:'Fin',
     eventPanelTitle:'Jalons', addBtn:'+ Ajouter', milestonePH:'Nom du jalon', milestoneDateLabel:'Date du jalon',
     daysLeft:'jours', daysAgo:'jours passés', today:"Aujourd'hui!",
@@ -856,7 +882,7 @@ const examLANGS = {
   pt: {
     presetWeek:'Semana', presetMonth:'Mês', presetQuarter:'Trimestre', presetYear:'Ano',
     presetPregnancy:'Gravidez', presetCustom:'Personalizado',
-    periodBoxLabel:'Período Personalizado', periodSetBtn:'Definir',
+    periodBoxLabel:'Período Personalizado', periodSetBtn:'Definir', periodStartLabel:'Início', periodEndLabel:'Fim',
     namePH:'Nome (ex: Dieta, Prazo)', startPH:'Início', endPH:'Fim',
     eventPanelTitle:'Marcos', addBtn:'+ Adicionar', milestonePH:'Nome do marco', milestoneDateLabel:'Data do marco',
     daysLeft:'dias', daysAgo:'dias atrás', today:'Hoje!',
@@ -972,6 +998,10 @@ function examSetLang(code){
     b.classList.toggle('active',b.textContent.trim()===map[code]);
   });
   document.getElementById('exam-periodBoxLabel').textContent=examL.periodBoxLabel;
+  const startLbl=document.getElementById('exam-periodStartLabel');
+  const endLbl=document.getElementById('exam-periodEndLabel');
+  if(startLbl) startLbl.textContent=examL.periodStartLabel||'Start';
+  if(endLbl) endLbl.textContent=examL.periodEndLabel||'End';
   document.getElementById('exam-periodSetBtn').textContent=examL.periodSetBtn;
   document.getElementById('exam-periodName').placeholder=examL.namePH;
   document.getElementById('exam-eventPanelTitle').textContent=examL.eventPanelTitle;
