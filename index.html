@@ -900,6 +900,18 @@ function examGetTheme(){
 let examCurrentPresetKey='week';
 let examDisplayMode='segment'; // 'segment'=連続区切り方式, 'ring'=階層リング方式
 let examPeriodStart=null, examPeriodEnd=null, examPeriodName='';
+
+// 文字盤を月表示にする際の、各言語ごとの月名（スペースが限られるため短い表記）
+const EXAM_MONTH_NAMES = {
+  en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  ja: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+  ko: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
+  zh: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+  hi: ['जन','फर','मार्च','अप्रै','मई','जून','जुल','अग','सित','अक्टू','नव','दिस'],
+  es: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+  fr: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
+  pt: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+};
 let examEvents=[], examColorIdx=0;
 
 // ── ローカルストレージ ──
@@ -2061,7 +2073,15 @@ function examDraw(){
       examCtx.fillStyle=T.tickLabel;
       examCtx.shadowColor=T.tickLabelGlow; examCtx.shadowBlur=6;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
-      const label = useMonthLabels ? `M${i}` : `D${Math.round(i/divisions*totalDays)}`;
+      let label;
+      if(useMonthLabels){
+        const dayAtTick = i/divisions*totalDays;
+        const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
+        const monthNames = EXAM_MONTH_NAMES[examLang] || EXAM_MONTH_NAMES.en;
+        label = monthNames[tickDate.getMonth()];
+      } else {
+        label = `D${Math.round(i/divisions*totalDays)}`;
+      }
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
     }
