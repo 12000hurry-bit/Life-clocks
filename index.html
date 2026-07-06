@@ -468,9 +468,13 @@
   body.light-mode .top-bar .title { color: #94a3b8; }
   body.light-mode .lang-btn, body.light-mode .preset-tab, body.light-mode .view-mode-btn,
   body.light-mode .period-box, body.light-mode .event-panel, body.light-mode .data-panel,
-  body.light-mode .edit-modal {
+  body.light-mode .birth-box, body.light-mode .edit-modal {
     background: #ffffff; border-color: #e2e8f0; color: #475569;
   }
+  body.light-mode .birth-row input, body.light-mode .birth-row select {
+    background: #f1f5f9; border-color: #e2e8f0; color: #334155;
+  }
+  body.light-mode .birth-box label { color: #64748b; }
   body.light-mode .event-item, body.light-mode .data-btn,
   body.light-mode .period-row input, body.light-mode .event-add-row input {
     background: #f1f5f9; border-color: #e2e8f0; color: #334155;
@@ -5568,6 +5572,24 @@ function closeManageTabsModal(){
   const ov=document.getElementById('manageTabsOverlay');
   if(ov) ov.classList.remove('on');
 }
+function handleManageDeleteClick(tabId){
+  clearTimeout(manageDeleteArmedTimer);
+  if(manageDeleteArmedId===tabId){
+    // 2回目のタップ：実際に削除する（ネイティブconfirmは使わない）
+    manageDeleteArmedId=null;
+    performDeleteCustomTab(tabId);
+  } else {
+    // 1回目のタップ：「もう一度タップで削除」表示に切り替え、
+    // 数秒後に自動的に元に戻す（誤操作防止）
+    manageDeleteArmedId=tabId;
+    renderManageTabsList();
+    manageDeleteArmedTimer=setTimeout(()=>{
+      manageDeleteArmedId=null;
+      renderManageTabsList();
+    }, 3000);
+  }
+}
+
 function renderManageTabsList(){
   const listEl=document.getElementById('manageTabsList');
   if(!listEl) return;
@@ -5588,9 +5610,19 @@ function renderManageTabsList(){
       <button type="button" class="manage-tab-delete-btn${armed?' armed':''}" data-manage-delete-id="${tab.id}">${armed?(L.manageConfirmBtn||'Tap again to delete'):L.manageDeleteBtn}</button>
     </div>`;
   }).join('');
+
+  // イベント委譲（親要素頼み）だと環境によっては反応しないことが分かったため、
+  // 描画した各ボタンに直接リスナーを1つずつ付け直す（ゴミ箱ボタンと同じ確実な方式）。
+  const delBtns = listEl.querySelectorAll('[data-manage-delete-id]');
+  delBtns.forEach(function(btn){
+    btn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      handleManageDeleteClick(btn.dataset.manageDeleteId);
+    });
+  });
+  showToast('DEBUG: ' + delBtns.length + ' 個の削除ボタンにリスナー設定完了'); // 一時的な調査用
 }
 
-// 管理モーダル内の各種ボタンも、確実性を優先してイベント委譲で処理する
 function setupManageTabsDelegation(){
   const btn=document.getElementById('manageTabsBtn');
   if(btn) btn.addEventListener('click', openManageTabsModal);
@@ -5604,32 +5636,8 @@ function setupManageTabsDelegation(){
       if(ev.target===overlay) closeManageTabsModal(); // 背景タップでも閉じる
     });
   }
-
-  const listEl=document.getElementById('manageTabsList');
-  if(listEl){
-    listEl.addEventListener('click', function(ev){
-      const delBtn=ev.target.closest('[data-manage-delete-id]');
-      showToast('DEBUG target=' + ev.target.tagName + (delBtn? ' →BTN OK':' →NOT MATCHED')); // 一時的な調査用
-      if(!delBtn) return;
-      const tabId=delBtn.dataset.manageDeleteId;
-      clearTimeout(manageDeleteArmedTimer);
-      if(manageDeleteArmedId===tabId){
-        // 2回目のタップ：実際に削除する（ネイティブconfirmは使わない）
-        manageDeleteArmedId=null;
-        performDeleteCustomTab(tabId);
-      } else {
-        // 1回目のタップ：「もう一度タップで削除」表示に切り替え、
-        // 数秒後に自動的に元に戻す（誤操作防止）
-        manageDeleteArmedId=tabId;
-        renderManageTabsList();
-        manageDeleteArmedTimer=setTimeout(()=>{
-          manageDeleteArmedId=null;
-          renderManageTabsList();
-        }, 3000);
-      }
-    });
-  }
 }
+
 
 function createCustomPanelDom(tabData){
   const tpl = document.getElementById('customPanelTemplate');
