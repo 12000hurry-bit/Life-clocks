@@ -375,6 +375,8 @@
   .overflow-notice-dot {
     width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
   }
+  body.light-mode .overflow-notice { color: #475569; }
+  body.light-mode .overflow-notice-label { color: #1e293b; }
   /* フォームエラーメッセージ */
   .form-error {
     font-size: 12px; color: #f87171;
@@ -1997,18 +1999,23 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
     const MIN_SPAN_FOR_LABEL = 7; // これ未満の角度幅はラベル省略
     if(segSpan >= MIN_SPAN_FOR_LABEL){
       const fontSize=Math.max(13,Math.min(22,segSpan/5));
+      const chipTheme=examGetTheme();
       examCtx.save();
       examCtx.font=`bold ${fontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
       const maxC=Math.max(5,Math.floor(segSpan/6));
       const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
       // 背景色（マイルストーンの色）が明るい場合でも確実に読めるよう、
-      // 文字の後ろに濃い不透明の帯を敷いてから白文字を描画する
+      // 文字の後ろにテーマに応じた不透明の帯を敷いてから描画する
+      // （ダークモード：黒地に白文字／ライトモード：白地に濃色文字）
       const chipW=examCtx.measureText(label).width + fontSize*1.0;
       const chipH=fontSize*1.6;
-      examCtx.fillStyle='#050609';
+      examCtx.fillStyle=chipTheme.innerFace;
+      examCtx.strokeStyle=`rgba(${rv},${gv},${bv},0.9)`;
+      examCtx.lineWidth=1.5;
       examCtx.fillRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
-      examCtx.fillStyle='#ffffff';
+      examCtx.strokeRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
+      examCtx.fillStyle=chipTheme.centerNum;
       examCtx.fillText(label,lx,ly);
       examCtx.restore();
     } else {
@@ -2104,13 +2111,17 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     examCtx.textAlign='center'; examCtx.textBaseline='middle';
     const maxC=Math.max(5,Math.floor(ringH/fontSize*2.4));
     const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
-    // 背景色（マイルストーンの色）に関わらず読めるよう、文字の後ろに濃い不透明の帯を敷く（過去分は少し薄く）
+    // 背景色（マイルストーンの色）に関わらず読めるよう、文字の後ろにテーマに応じた不透明の帯を敷く（過去分は少し薄く）
+    const chipTheme=examGetTheme();
     examCtx.globalAlpha=isPast?0.6:1;
     const chipW=examCtx.measureText(label).width + fontSize*1.0;
     const chipH=fontSize*1.6;
-    examCtx.fillStyle='#050609';
+    examCtx.fillStyle=chipTheme.innerFace;
+    examCtx.strokeStyle=`rgba(${rv},${gv},${bv},0.9)`;
+    examCtx.lineWidth=1.5;
     examCtx.fillRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
-    examCtx.fillStyle='#ffffff';
+    examCtx.strokeRect(lx-chipW/2, ly-chipH/2, chipW, chipH);
+    examCtx.fillStyle=chipTheme.centerNum;
     examCtx.fillText(label,lx,ly);
     examCtx.restore();
 
@@ -2189,12 +2200,13 @@ function examDraw(){
         const monthNames = EXAM_MONTH_NAMES[examLang] || EXAM_MONTH_NAMES.en;
         label = monthNames[tickDate.getMonth()];
       } else if(totalDays<=7){
-        // 週表示：曜日 + 実際の日付（日）の両方を表示する
+        // 週表示：実際の日付（日）＋単位＋曜日を表示する
         const dayAtTick = i/divisions*totalDays;
         const tickDate = new Date(examPeriodStart + dayAtTick*24*3600*1000);
         const weekdayNames = EXAM_WEEKDAY_NAMES[examLang] || EXAM_WEEKDAY_NAMES.en;
         const wd = weekdayNames[tickDate.getDay()];
-        label = /^[a-zA-Z]/.test(wd) ? `${tickDate.getDate()} ${wd}` : `${tickDate.getDate()}${wd}`;
+        const dayUnit = EXAM_DAY_UNIT[examLang] || '';
+        label = `${tickDate.getDate()}${dayUnit} (${wd})`;
       } else {
         // 週より長いが月表示にはまだ満たない期間：実際の日付（日）＋言語ごとの単位を表示
         const dayAtTick = i/divisions*totalDays;
