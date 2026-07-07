@@ -957,6 +957,9 @@ function examGetTheme(){
 let examCurrentPresetKey='week';
 let examDisplayMode='segment'; // 'segment'=連続区切り方式, 'ring'=階層リング方式
 let examPeriodStart=null, examPeriodEnd=null, examPeriodName='';
+// カスタム期間専用の記憶領域。週間/月間/年間などのプリセットに切り替えても、
+// ここに保存された内容は上書きされない（「カスタム」タブに戻った時に復元するため）。
+let examCustomPeriodStart=null, examCustomPeriodEnd=null, examCustomPeriodName='';
 
 // 週表示の目盛り用：各言語の曜日名（短縮表記）。getDay()の0=日曜始まりに合わせる
 const EXAM_WEEKDAY_NAMES = {
@@ -994,14 +997,15 @@ let examEvents=[], examColorIdx=0;
 // ── ローカルストレージ ──
 function examSave(){
   try {
-    localStorage.setItem('mc_exam_period', JSON.stringify({examPeriodStart,examPeriodEnd,examPeriodName,examCurrentPresetKey,examDisplayMode}));
+    localStorage.setItem('mc_exam_period', JSON.stringify({examPeriodStart,examPeriodEnd,examPeriodName,examCurrentPresetKey,examDisplayMode,examCustomPeriodStart,examCustomPeriodEnd,examCustomPeriodName}));
     localStorage.setItem('mc_exam_events', JSON.stringify(examEvents));
   } catch(e){}
 }
 function examLoad(){
   try {
     const p=localStorage.getItem('mc_exam_period');
-    if(p){ const d=JSON.parse(p); examPeriodStart=d.examPeriodStart; examPeriodEnd=d.examPeriodEnd; examPeriodName=d.examPeriodName; examCurrentPresetKey=d.examCurrentPresetKey||'week'; examDisplayMode=d.examDisplayMode||'segment'; }
+    if(p){ const d=JSON.parse(p); examPeriodStart=d.examPeriodStart; examPeriodEnd=d.examPeriodEnd; examPeriodName=d.examPeriodName; examCurrentPresetKey=d.examCurrentPresetKey||'week'; examDisplayMode=d.examDisplayMode||'segment';
+      examCustomPeriodStart=d.examCustomPeriodStart||null; examCustomPeriodEnd=d.examCustomPeriodEnd||null; examCustomPeriodName=d.examCustomPeriodName||''; }
     const ev=localStorage.getItem('mc_exam_events');
     if(ev){ examEvents=JSON.parse(ev); examColorIdx=examEvents.length; }
   } catch(e){}
@@ -1084,8 +1088,21 @@ function examSelectPreset(key){
   event.target.closest('.preset-tab').classList.add('active');
 
   if(key==='custom'){
-    // カスタムの場合は入力欄にフォーカスを促すのみ
-    examSave();
+    // 以前カスタム期間を設定済みなら、それを復元する
+    // （年間・月間などに切り替えた後でも、カスタムの内容が消えないようにするため）
+    if(examCustomPeriodStart && examCustomPeriodEnd){
+      examPeriodStart=examCustomPeriodStart;
+      examPeriodEnd=examCustomPeriodEnd;
+      examPeriodName=examCustomPeriodName;
+      document.getElementById('exam-periodStart').value=new Date(examPeriodStart).toISOString().split('T')[0];
+      document.getElementById('exam-periodEnd').value=new Date(examPeriodEnd).toISOString().split('T')[0];
+      document.getElementById('exam-periodName').value=examCustomPeriodName;
+      examSave();
+      examCheckOutOfRangeMilestones();
+    } else {
+      // まだ一度もカスタム期間を設定したことがない場合は、入力を促すのみ
+      examSave();
+    }
     return;
   }
 
@@ -1214,6 +1231,12 @@ function examSetCustomPeriod(){
   examPeriodEnd=eMs;
   examPeriodName=name||examL.presetCustom;
   examCurrentPresetKey='custom';
+  // カスタム期間専用の記憶領域にも保存する。
+  // これにより、他のプリセット（年間・月間・3ヶ月など）に切り替えた後
+  // 「カスタム」タブに戻っても、ここで設定した内容が消えずに復元される。
+  examCustomPeriodStart=sMs;
+  examCustomPeriodEnd=eMs;
+  examCustomPeriodName=examPeriodName;
   examBuildPresetTabs();
   examSave();
   examCheckOutOfRangeMilestones();
