@@ -2187,9 +2187,14 @@ function examDraw(){
       // 最後の目盛り（i===divisions、角度360°）は最初の目盛り（0°）と同じ位置になるため、
       // ラベルが重なって読めなくなる。目盛り線だけ描いてラベルは省略する。
       if(i<divisions){
-      const [lx,ly]=examPolar(460,deg);
+      // 週表示は「7日 (火)」のように文字列が長くなるため、3時・9時位置で
+      // 画面端からはみ出さないよう、内側かつ少し小さめのフォントで描画する
+      const isWeekView = totalDays<=7;
+      const labelR = isWeekView ? 430 : 460;
+      const labelFontSize = isWeekView ? 16 : 20;
+      const [lx,ly]=examPolar(labelR,deg);
       examCtx.save();
-      examCtx.font='bold 20px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif';
+      examCtx.font=`bold ${labelFontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
       examCtx.fillStyle=T.tickLabel;
       examCtx.shadowColor=T.tickLabelGlow; examCtx.shadowBlur=6;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
