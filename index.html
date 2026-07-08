@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#6366f1">
+<meta name="theme-color" content="#5b6ee0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Exam Clock">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&family=DM+Mono:wght@300;400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&family=DM+Mono:wght@300;400&family=Space+Grotesk:wght@500;700&display=swap">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exam Clock</title>
 <style>
@@ -17,8 +17,8 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: #0a0b10;
-    color: #e2e8f0;
+    background: #1a1c22;
+    color: #e8e6df;
     font-family: 'DM Mono', sans-serif;
     min-height: 100vh;
     display: flex;
@@ -31,17 +31,17 @@
   /* テーマ切り替えボタン（画面右上に固定） */
   .global-theme-toggle-bar {
     width: 100%; display: flex; justify-content: flex-end;
-    background: #0d0e14; border-bottom: 1px solid #1e293b;
+    background: #0d0e14; border-bottom: 1px solid #3a3f4d;
     position: sticky; top: 0; z-index: 50;
   }
   .global-theme-toggle {
     flex: 0 0 auto;
     display: flex; align-items: center; justify-content: center;
     padding: 14px 16px;
-    font-size: 16px; color: #64748b;
+    font-size: 16px; color: #7a766e;
     cursor: pointer; transition: all .2s;
   }
-  .global-theme-toggle:hover { color: #a5b4fc; background: rgba(99,102,241,0.08); }
+  .global-theme-toggle:hover { color: #b0bcf5; background: rgba(91,110,224,0.08); }
 
   /* ══════════════════════════════
      各パネル共通コンテナ
@@ -58,17 +58,17 @@
   .clock-panel.active { display: flex; }
 
   .top-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; width:100%; }
-  .title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #475569; text-transform: uppercase; }
+  .title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #5c584f; text-transform: uppercase; }
   .lang-btns { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; margin-left:auto; }
-  .lang-btn { background: #0f1020; border: 1px solid #1e293b; border-radius: 6px; color: #64748b; font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 8px; cursor: pointer; transition: all .2s; }
-  .lang-btn.active, .lang-btn:hover { background: #6366f1; border-color: #6366f1; color: #fff; }
+  .lang-btn { background: #242731; border: 1px solid #3a3f4d; border-radius: 6px; color: #7a766e; font-family: 'DM Mono', monospace; font-size: 10px; padding: 4px 8px; cursor: pointer; transition: all .15s; box-shadow: 1.5px 1.5px 0 rgba(0,0,0,0.35); }
+  .lang-btn.active, .lang-btn:hover { background: #5b6ee0; border-color: #5b6ee0; color: #fff; box-shadow: 0.5px 0.5px 0 rgba(0,0,0,0.35); transform: translate(1px,1px); }
 
   .theme-toggle {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 6px;
-    color: #64748b; font-size: 14px; padding: 4px 8px; cursor: pointer;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 6px;
+    color: #7a766e; font-size: 14px; padding: 4px 8px; cursor: pointer;
     transition: all .2s;
   }
-  .theme-toggle:hover { border-color: #6366f1; }
+  .theme-toggle:hover { border-color: #5b6ee0; }
 
   canvas { display: block; width: min(92vw, 460px); height: min(92vw, 460px); }
 
@@ -78,118 +78,133 @@
 
   /* プリセット期間選択 */
   .preset-tabs {
-    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
     max-width: 480px;
   }
   .preset-tab {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 20px;
-    color: #64748b; font-family: 'DM Mono', monospace; font-size: 12px;
-    padding: 7px 14px; cursor: pointer; transition: all .2s;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #7a766e; font-family: 'DM Mono', monospace; font-size: 12px;
+    padding: 8px 14px; cursor: pointer; transition: all .15s;
     display: flex; align-items: center; gap: 5px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
   }
-  .preset-tab.active { background: #4338ca; border-color: #6366f1; color: #fff; }
-  .preset-tab:hover:not(.active) { border-color: #4338ca; color: #a5b4fc; }
+  .preset-tab.active {
+    background: #3d4faa; border-color: #5b6ee0; color: #fff;
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.35);
+    transform: translate(1px,1px);
+  }
+  .preset-tab:hover:not(.active) { border-color: #3d4faa; color: #b0bcf5; }
+  .preset-tab:active { transform: translate(2px,2px); box-shadow: none; }
 
   /* 表示モード切替 */
   .view-mode-row {
-    display: flex; gap: 6px; justify-content: center;
+    display: flex; gap: 8px; justify-content: center;
   }
   .view-mode-btn {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 8px;
-    color: #64748b; font-family: 'DM Mono', monospace; font-size: 11px;
-    padding: 6px 12px; cursor: pointer; transition: all .2s;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #7a766e; font-family: 'DM Mono', monospace; font-size: 11px;
+    padding: 7px 12px; cursor: pointer; transition: all .15s;
     display: flex; align-items: center; gap: 5px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
   }
   .view-mode-btn.active {
-    background: #4338ca; border-color: #6366f1; color: #fff;
+    background: #3d4faa; border-color: #5b6ee0; color: #fff;
+    box-shadow: 1px 1px 0 rgba(0,0,0,0.35);
+    transform: translate(1px,1px);
   }
-  .view-mode-btn:hover:not(.active) { border-color: #4338ca; color: #a5b4fc; }
+  .view-mode-btn:hover:not(.active) { border-color: #3d4faa; color: #b0bcf5; }
 
 
   .center-display { text-align: center; }
   .center-num {
-    font-family: 'DM Mono', monospace;
-    font-size: clamp(24px, 6vw, 34px);
-    font-weight: 300; color: #e2e8f0; letter-spacing: 0.05em;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 7vw, 40px);
+    font-weight: 700; color: #e8e6df; letter-spacing: 0.02em;
   }
-  .center-label { font-size: 12px; color: #64748b; margin-top: 2px; letter-spacing: 0.05em; }
+  .center-label { font-size: 12px; color: #7a766e; margin-top: 2px; letter-spacing: 0.05em; }
   /* 「今日」を意識できるよう、日付を目立つ形で表示する */
   .today-display {
     display: inline-flex; align-items: center; gap: 6px;
     margin-top: 10px; padding: 6px 16px;
-    background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.35);
-    border-radius: 20px;
+    background: #3d4faa; border: 1px solid #5b6ee0;
+    border-radius: 8px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
     font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700;
-    color: #a5b4fc; letter-spacing: 0.03em;
+    color: #fff; letter-spacing: 0.03em;
   }
-  body.light-mode .today-display { background: rgba(99,102,241,0.08); color: #4338ca; }
+  body.light-mode .today-display { background: #5b6ee0; border-color: #3d4faa; color: #fff; }
 
   /* 期間設定パネル */
   .period-box {
     width: min(92vw, 460px);
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 14px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 10px;
     padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
   }
-  .period-box label { font-size: 11px; letter-spacing: 0.2em; color: #475569; text-transform: uppercase; }
+  .period-box label { font-size: 11px; letter-spacing: 0.2em; color: #5c584f; text-transform: uppercase; }
   .period-row { display: flex; gap: 8px; align-items: flex-end; }
   .period-row input[type="text"] {
-    flex: 1; background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
+    flex: 1; background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #e8e6df; font-family: 'DM Mono', monospace; font-size: 13px;
     padding: 8px 10px; outline: none; transition: border-color .2s;
   }
   .period-date-field { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
   .period-date-caption {
-    font-size: 9px; letter-spacing: 0.08em; color: #475569;
+    font-size: 9px; letter-spacing: 0.08em; color: #5c584f;
     text-transform: uppercase; white-space: nowrap;
   }
-  body.light-mode .period-date-caption { color: #64748b; }
+  body.light-mode .period-date-caption { color: #7a766e; }
   .period-row input[type="date"] {
-    width: 100%; background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
+    width: 100%; background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #e8e6df; font-family: 'DM Mono', monospace; font-size: 13px;
     padding: 8px 10px; outline: none; transition: border-color .2s;
   }
-  .period-row input:focus { border-color: #6366f1; }
+  .period-row input:focus { border-color: #5b6ee0; }
   .period-row button {
-    background: #6366f1; border: none; border-radius: 8px; color: #fff;
+    background: #5b6ee0; border: none; border-radius: 8px; color: #fff;
     font-size: 13px; font-weight: 700; padding: 8px 16px; cursor: pointer;
-    white-space: nowrap; transition: opacity .2s;
+    white-space: nowrap; transition: all .1s;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
   }
-  .period-row button:hover { opacity: .8; }
+  .period-row button:hover { opacity: .9; }
+  .period-row button:active { transform: translate(2px,2px); box-shadow: none; }
 
   /* サブ目標パネル */
   .event-panel {
     width: min(92vw, 460px);
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 14px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 10px;
     padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
   }
-  .event-panel-title { font-size: 11px; letter-spacing: 0.2em; color: #475569; text-transform: uppercase; }
+  .event-panel-title { font-size: 11px; letter-spacing: 0.2em; color: #5c584f; text-transform: uppercase; }
   .event-add-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
   .event-add-row input {
-    background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 12px;
+    background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #e8e6df; font-family: 'DM Mono', monospace; font-size: 12px;
     padding: 8px 10px; outline: none; width: 100%;
   }
   /* 日付入力欄：初見でも「これは何の日付か」が分かるよう、上に小さな見出しを添える */
   .milestone-date-field { display: flex; flex-direction: column; gap: 3px; }
   .milestone-date-caption {
-    font-size: 9px; letter-spacing: 0.08em; color: #475569;
+    font-size: 9px; letter-spacing: 0.08em; color: #5c584f;
     text-transform: uppercase; white-space: nowrap;
   }
-  body.light-mode .milestone-date-caption { color: #64748b; }
-  .add-btn { grid-column: 1/-1; background: #6366f1; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 700; padding: 9px; cursor: pointer; transition: opacity .2s; }
-  .add-btn:hover { opacity: .8; }
+  body.light-mode .milestone-date-caption { color: #7a766e; }
+  .add-btn { grid-column: 1/-1; background: #5b6ee0; border: none; border-radius: 8px; color: #fff; font-size: 13px; font-weight: 700; padding: 9px; cursor: pointer; transition: all .1s; box-shadow: 2px 2px 0 rgba(0,0,0,0.35); }
+  .add-btn:hover { opacity: .9; }
+  .add-btn:active { transform: translate(2px,2px); box-shadow: none; }
   .event-list { display: flex; flex-direction: column; gap: 7px; }
-  .event-item { display: flex; align-items: center; gap: 10px; background: #0a0b10; border: 1px solid #1e293b; border-radius: 10px; padding: 9px 12px; }
+  .event-item { display: flex; align-items: center; gap: 10px; background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px; padding: 9px 12px; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
   .event-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .event-info { flex: 1; min-width: 0; }
-  .event-name { font-size: 13px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .event-meta { font-size: 10px; color: #475569; margin-top: 2px; }
-  .event-days { font-family: 'DM Mono', monospace; font-size: 16px; color: #e2e8f0; flex-shrink: 0; text-align: right; min-width: 55px; }
-  .event-days small { font-size: 10px; color: #475569; margin-left: 2px; }
-  .event-delete { background: none; border: none; color: #334155; font-size: 16px; cursor: pointer; padding: 0 4px; }
-  .event-delete:hover { color: #f87171; }
-  .event-edit { background: none; border: none; color: #334155; font-size: 14px; cursor: pointer; padding: 0 4px; transition: color .2s; }
-  .event-edit:hover { color: #818cf8; }
+  .event-name { font-size: 13px; color: #e8e6df; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .event-meta { font-size: 10px; color: #5c584f; margin-top: 2px; }
+  .event-days { font-family: 'DM Mono', monospace; font-size: 16px; color: #e8e6df; flex-shrink: 0; text-align: right; min-width: 55px; }
+  .event-days small { font-size: 10px; color: #5c584f; margin-left: 2px; }
+  .event-delete { background: none; border: none; color: #4a4740; font-size: 16px; cursor: pointer; padding: 0 4px; }
+  .event-delete:hover { color: #d1683f; }
+  .event-edit { background: none; border: none; color: #4a4740; font-size: 14px; cursor: pointer; padding: 0 4px; transition: color .2s; }
+  .event-edit:hover { color: #8b9af0; }
 
   /* 色選択パレット（視認性向上版） */
   .color-picker-row {
@@ -204,8 +219,8 @@
   }
   .color-swatch.selected {
     border-color: #fff;
-    transform: scale(1.2);
-    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px #1a1c22, 0 0 0 4px #fff;
   }
   .color-swatch.selected::after {
     content: '✓';
@@ -215,7 +230,7 @@
     text-shadow: 0 1px 3px rgba(0,0,0,0.8);
   }
   .color-picker-label {
-    font-size: 11px; color: #475569; width: 100%; text-align: center;
+    font-size: 11px; color: #5c584f; width: 100%; text-align: center;
     margin-bottom: 2px;
   }
 
@@ -227,19 +242,19 @@
   }
   .edit-modal-overlay.on { display: flex; }
   .edit-modal {
-    background: #0f1020; border: 1px solid #334155; border-radius: 16px;
+    background: #242731; border: 1px solid #4a4740; border-radius: 16px;
     padding: 24px; width: 100%; max-width: 360px;
     display: flex; flex-direction: column; gap: 14px;
   }
-  .edit-modal-title { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+  .edit-modal-title { font-size: 15px; font-weight: 700; color: #e8e6df; }
   .edit-modal input[type="text"], .edit-modal input[type="date"] {
-    background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
+    background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #e8e6df; font-family: 'DM Mono', monospace; font-size: 13px;
     padding: 9px 12px; outline: none; width: 100%;
     transition: border-color .2s;
   }
   .edit-modal input.input-error {
-    border-color: #f87171;
+    border-color: #d1683f;
     animation: shakeInput .3s;
   }
   @keyframes shakeInput {
@@ -254,8 +269,8 @@
     transition: opacity .2s;
   }
   .edit-modal-btns button:hover { opacity: .85; }
-  .edit-save-btn { background: #6366f1; color: #fff; }
-  .edit-cancel-btn { background: #1e293b; color: #94a3b8; }
+  .edit-save-btn { background: #5b6ee0; color: #fff; }
+  .edit-cancel-btn { background: #3a3f4d; color: #a8a49c; }
 
   /* データ管理パネル */
   /* 削除確認モーダル */
@@ -266,14 +281,14 @@
   }
   .confirm-modal-overlay.on { display: flex; }
   .confirm-modal {
-    background: #0f1020; border: 1px solid #f87171; border-radius: 16px;
+    background: #242731; border: 1px solid #d1683f; border-radius: 16px;
     padding: 24px; width: 100%; max-width: 320px;
     display: flex; flex-direction: column; gap: 14px;
     text-align: center;
   }
   .confirm-modal-icon { font-size: 36px; }
-  .confirm-modal-msg { font-size: 14px; color: #e2e8f0; line-height: 1.6; }
-  .confirm-modal-sub { font-size: 12px; color: #64748b; }
+  .confirm-modal-msg { font-size: 14px; color: #e8e6df; line-height: 1.6; }
+  .confirm-modal-sub { font-size: 12px; color: #7a766e; }
   .confirm-modal-btns { display: flex; gap: 8px; margin-top: 4px; }
   .confirm-modal-btns button {
     flex: 1; border: none; border-radius: 8px;
@@ -281,8 +296,8 @@
     transition: opacity .2s;
   }
   .confirm-modal-btns button:hover { opacity: .85; }
-  .confirm-delete-btn { background: #f87171; color: #fff; }
-  .confirm-cancel-btn { background: #1e293b; color: #94a3b8; }
+  .confirm-delete-btn { background: #d1683f; color: #fff; }
+  .confirm-cancel-btn { background: #3a3f4d; color: #a8a49c; }
 
   /* 妊娠期間の起点選択モーダル */
   .preg-modal-overlay {
@@ -292,41 +307,41 @@
   }
   .preg-modal-overlay.on { display: flex; }
   .preg-modal {
-    background: #0f1020; border: 1px solid #334155; border-radius: 16px;
+    background: #242731; border: 1px solid #4a4740; border-radius: 16px;
     padding: 22px; width: 100%; max-width: 360px;
     display: flex; flex-direction: column; gap: 14px;
   }
-  .preg-modal-title { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+  .preg-modal-title { font-size: 15px; font-weight: 700; color: #e8e6df; }
   .preg-toggle-row {
-    display: flex; gap: 6px; background: #0a0b10; border-radius: 10px; padding: 4px;
+    display: flex; gap: 6px; background: #1a1c22; border-radius: 10px; padding: 4px;
   }
   .preg-toggle-btn {
     flex: 1; background: none; border: none; border-radius: 8px;
-    color: #64748b; font-family: 'DM Mono', monospace; font-size: 12.5px;
+    color: #7a766e; font-family: 'DM Mono', monospace; font-size: 12.5px;
     padding: 9px; cursor: pointer; transition: all .2s;
   }
   .preg-toggle-btn.active {
-    background: #6366f1; color: #fff;
+    background: #5b6ee0; color: #fff;
   }
-  .preg-toggle-btn:hover:not(.active) { color: #94a3b8; }
+  .preg-toggle-btn:hover:not(.active) { color: #a8a49c; }
   .preg-option-row { display: flex; gap: 8px; }
   .preg-option-row input[type="date"] {
-    flex: 1; background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #e2e8f0; font-family: 'DM Mono', monospace; font-size: 13px;
+    flex: 1; background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #e8e6df; font-family: 'DM Mono', monospace; font-size: 13px;
     padding: 8px 10px; outline: none;
   }
   .preg-option-row button {
-    background: #6366f1; border: none; border-radius: 8px; color: #fff;
+    background: #5b6ee0; border: none; border-radius: 8px; color: #fff;
     font-size: 12.5px; font-weight: 700; padding: 8px 14px; cursor: pointer;
     white-space: nowrap; transition: opacity .2s;
   }
   .preg-option-row button:hover { opacity: .85; }
   .preg-modal-cancel {
-    background: none; border: 1px solid #1e293b; border-radius: 8px;
-    color: #64748b; font-size: 12.5px; padding: 8px; cursor: pointer;
+    background: none; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #7a766e; font-size: 12.5px; padding: 8px; cursor: pointer;
     transition: all .2s;
   }
-  .preg-modal-cancel:hover { border-color: #334155; color: #94a3b8; }
+  .preg-modal-cancel:hover { border-color: #4a4740; color: #a8a49c; }
 
   /* 期間外マイルストーン確認モーダル */
   .range-modal-overlay {
@@ -336,13 +351,13 @@
   }
   .range-modal-overlay.on { display: flex; }
   .range-modal {
-    background: #0f1020; border: 1px solid #fbbf24; border-radius: 16px;
+    background: #242731; border: 1px solid #fbbf24; border-radius: 16px;
     padding: 22px; width: 100%; max-width: 320px;
     display: flex; flex-direction: column; gap: 12px;
     text-align: center;
   }
   .range-modal-icon { font-size: 32px; }
-  .range-modal-msg { font-size: 13.5px; color: #e2e8f0; line-height: 1.6; }
+  .range-modal-msg { font-size: 13.5px; color: #e8e6df; line-height: 1.6; }
   .range-modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
   .range-modal-btns button {
     border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
@@ -350,24 +365,24 @@
   }
   .range-modal-btns button:hover { opacity: .85; }
   .range-extend-btn { background: #fbbf24; color: #1a1a0a; }
-  .range-cancel-btn { background: #1e293b; color: #94a3b8; }
+  .range-cancel-btn { background: #3a3f4d; color: #a8a49c; }
 
   /* 今日に戻るボタン */
   .today-reset-btn {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 8px;
-    color: #64748b; font-family: 'DM Mono', monospace; font-size: 11px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #7a766e; font-family: 'DM Mono', monospace; font-size: 11px;
     padding: 6px 12px; cursor: pointer; transition: all .2s;
   }
-  .today-reset-btn:hover { border-color: #6366f1; color: #a5b4fc; }
+  .today-reset-btn:hover { border-color: #5b6ee0; color: #b0bcf5; }
 
   /* オーバーフローしたマイルストーンのリスト表示 */
   .overflow-notice {
-    font-size: 11px; color: #94a3b8; text-align: center;
+    font-size: 11px; color: #a8a49c; text-align: center;
     padding: 6px; display: none;
     line-height: 2;
   }
   .overflow-notice.show { display: block; }
-  .overflow-notice-label { color: #64748b; margin-right: 2px; }
+  .overflow-notice-label { color: #7a766e; margin-right: 2px; }
   .overflow-notice-item {
     display: inline-flex; align-items: center; gap: 4px;
     margin: 0 6px; white-space: nowrap;
@@ -375,30 +390,30 @@
   .overflow-notice-dot {
     width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto;
   }
-  body.light-mode .overflow-notice { color: #475569; }
-  body.light-mode .overflow-notice-label { color: #1e293b; }
+  body.light-mode .overflow-notice { color: #5c584f; }
+  body.light-mode .overflow-notice-label { color: #3a3f4d; }
   /* フォームエラーメッセージ */
   .form-error {
-    font-size: 12px; color: #f87171;
+    font-size: 12px; color: #d1683f;
     display: none; padding: 2px 2px 0;
   }
   .form-error.show { display: block; }
 
   .data-panel {
     width: min(92vw, 460px);
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 14px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 14px;
     padding: 14px 18px; display: flex; flex-direction: column; gap: 10px;
   }
-  .data-panel-title { font-size: 11px; letter-spacing: 0.2em; color: #475569; text-transform: uppercase; }
+  .data-panel-title { font-size: 11px; letter-spacing: 0.2em; color: #5c584f; text-transform: uppercase; }
   .data-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .data-btn {
     flex: 1; min-width: 100px;
-    background: #0a0b10; border: 1px solid #1e293b; border-radius: 8px;
-    color: #94a3b8; font-family: 'DM Mono', monospace; font-size: 12px;
+    background: #1a1c22; border: 1px solid #3a3f4d; border-radius: 8px;
+    color: #a8a49c; font-family: 'DM Mono', monospace; font-size: 12px;
     padding: 9px; cursor: pointer; transition: all .2s;
     display: flex; align-items: center; justify-content: center; gap: 5px;
   }
-  .data-btn:hover { border-color: #6366f1; color: #a5b4fc; }
+  .data-btn:hover { border-color: #5b6ee0; color: #b0bcf5; }
   #exam-importFileInput { display: none; }
 
   /* 共有ボタン */
@@ -406,24 +421,24 @@
     display: flex; gap: 8px; justify-content: center;
   }
   .share-btn {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 10px;
-    color: #94a3b8; font-family: 'DM Mono', monospace; font-size: 12px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 10px;
+    color: #a8a49c; font-family: 'DM Mono', monospace; font-size: 12px;
     padding: 8px 16px; cursor: pointer; transition: all .2s;
     display: flex; align-items: center; gap: 6px;
   }
-  .share-btn:hover { border-color: #6366f1; color: #a5b4fc; }
+  .share-btn:hover { border-color: #5b6ee0; color: #b0bcf5; }
   .share-size-select {
-    background: #0f1020; border: 1px solid #1e293b; border-radius: 10px;
-    color: #94a3b8; font-family: 'DM Mono', monospace; font-size: 12px;
+    background: #242731; border: 1px solid #3a3f4d; border-radius: 10px;
+    color: #a8a49c; font-family: 'DM Mono', monospace; font-size: 12px;
     padding: 8px 10px; cursor: pointer; outline: none;
   }
-  .share-size-select option { background: #0f1020; }
+  .share-size-select option { background: #242731; }
 
   /* トースト通知 */
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: #1e1b4b; border: 1px solid #6366f1; border-radius: 10px;
-    color: #e2e8f0; font-size: 13px; padding: 12px 20px;
+    background: #1e1b4b; border: 1px solid #5b6ee0; border-radius: 10px;
+    color: #e8e6df; font-size: 13px; padding: 12px 20px;
     z-index: 300; opacity: 0; transition: all .3s ease;
     pointer-events: none;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
@@ -436,49 +451,49 @@
     border-color: #34d399;
   }
   .toast.toast-flash-subtle {
-    box-shadow: 0 0 0 4px rgba(248,113,113,0.4), 0 8px 24px rgba(0,0,0,0.4);
-    border-color: #f87171;
+    box-shadow: 0 0 0 4px rgba(209,104,63,0.4), 0 8px 24px rgba(0,0,0,0.4);
+    border-color: #d1683f;
   }
 
   /* ライトモード対応 */
   body.light-mode {
-    background: #f8fafc; color: #1e293b;
+    background: #f2efe8; color: #3a3f4d;
   }
-  body.light-mode .top-bar .title { color: #94a3b8; }
+  body.light-mode .top-bar .title { color: #a8a49c; }
   body.light-mode .lang-btn, body.light-mode .preset-tab, body.light-mode .view-mode-btn,
   body.light-mode .period-box, body.light-mode .event-panel, body.light-mode .data-panel,
   body.light-mode .edit-modal {
-    background: #ffffff; border-color: #e2e8f0; color: #475569;
+    background: #ffffff; border-color: #e8e6df; color: #5c584f;
   }
   body.light-mode .event-item, body.light-mode .data-btn,
   body.light-mode .period-row input, body.light-mode .event-add-row input {
-    background: #f1f5f9; border-color: #e2e8f0; color: #334155;
+    background: #e8e3d6; border-color: #e8e6df; color: #4a4740;
   }
   /* .event-name と .event-days は個別にcolorを指定しているため、
      親のcolor指定だけでは上書きされず、ライトモードでも暗いモード用の
      薄い文字色のままになってしまっていた（明るい背景に薄い文字＝読めない）。
      ここで明示的に上書きする。 */
   body.light-mode .event-name, body.light-mode .event-days {
-    color: #1e293b;
+    color: #3a3f4d;
   }
   body.light-mode .event-meta, body.light-mode .event-days small {
-    color: #64748b;
+    color: #7a766e;
   }
-  body.light-mode .center-num { color: #1e293b; }
-  body.light-mode footer { color: #cbd5e1; }
+  body.light-mode .center-num { color: #3a3f4d; }
+  body.light-mode footer { color: #ddd6c8; }
 
   /* 上のライトモード規則は「body.light-mode」を含むぶん詳細度が高く、
      .lang-btn.active 等の選択中スタイル（詳細度が低い）を無条件に
      上書きしてしまい、ライトモードではどのボタンが選択中か
      分からなくなっていた。ここで選択中スタイルを明示的に再指定する。 */
   body.light-mode .lang-btn.active, body.light-mode .lang-btn:hover {
-    background: #6366f1; border-color: #6366f1; color: #fff;
+    background: #5b6ee0; border-color: #5b6ee0; color: #fff;
   }
   body.light-mode .preset-tab.active, body.light-mode .view-mode-btn.active {
-    background: #4338ca; border-color: #6366f1; color: #fff;
+    background: #3d4faa; border-color: #5b6ee0; color: #fff;
   }
 
-  footer { font-size: 11px; color: #1e293b; letter-spacing: 0.1em; text-align: center; }
+  footer { font-size: 11px; color: #3a3f4d; letter-spacing: 0.1em; text-align: center; }
 
   @media (max-width: 380px) { .event-add-row, .period-row { grid-template-columns: 1fr; } }
 
@@ -660,7 +675,7 @@ const examCanvas = document.getElementById('exam-c');
 const examCtx = examCanvas.getContext('2d');
 const examW = 960, examCX = examW/2, examCY = examW/2;
 
-const examEVENT_COLORS = ['#f472b6','#34d399','#fbbf24','#60a5fa','#a78bfa','#f87171','#2dd4bf','#fb923c','#818cf8','#4ade80'];
+const examEVENT_COLORS = ['#f472b6','#34d399','#fbbf24','#60a5fa','#a78bfa','#d1683f','#2dd4bf','#fb923c','#8b9af0','#4ade80'];
 
 // ── プリセット期間定義（日数） ──
 // 実際の開始日は「今日」を起点に自動計算
@@ -931,24 +946,24 @@ let examLang='en', examL=examLANGS[examLang];
 // Canvas描画は素のCSS変数を参照できないため、テーマごとの配色をJS側で明示的に持つ
 const examTHEME_COLORS = {
   dark: {
-    bgGradInner:'#141726', bgGradOuter:'#0a0b10',
-    outerRing:'#1e293b',
-    tickMajor:'#94a3b8', tickMinor:'#334155',
-    tickLabel:'#94a3b8', tickLabelGlow:'rgba(148,163,184,0.4)',
-    innerFace:'#0a0b10', innerRingStroke:'#1e293b',
-    progressArc:'rgba(99,102,241,0.55)',
-    handColor:'#6366f1', handTip:'#818cf8',
-    centerNum:'#e2e8f0', centerLabel:'#64748b',
+    bgGradInner:'#202329', bgGradOuter:'#1a1c22',
+    outerRing:'#3a3f4d',
+    tickMajor:'#a8a49c', tickMinor:'#4a4740',
+    tickLabel:'#a8a49c', tickLabelGlow:'rgba(168,164,156,0.4)',
+    innerFace:'#1a1c22', innerRingStroke:'#3a3f4d',
+    progressArc:'rgba(91,110,224,0.55)',
+    handColor:'#5b6ee0', handTip:'#8b9af0',
+    centerNum:'#e8e6df', centerLabel:'#7a766e',
   },
   light: {
-    bgGradInner:'#e8ecf5', bgGradOuter:'#f8fafc',
-    outerRing:'#cbd5e1',
-    tickMajor:'#475569', tickMinor:'#94a3b8',
-    tickLabel:'#334155', tickLabelGlow:'rgba(71,85,105,0.25)',
-    innerFace:'#f8fafc', innerRingStroke:'#cbd5e1',
-    progressArc:'rgba(79,70,229,0.5)',
-    handColor:'#4338ca', handTip:'#6366f1',
-    centerNum:'#1e293b', centerLabel:'#64748b',
+    bgGradInner:'#ece7db', bgGradOuter:'#f2efe8',
+    outerRing:'#ddd6c8',
+    tickMajor:'#5c584f', tickMinor:'#a8a49c',
+    tickLabel:'#4a4740', tickLabelGlow:'rgba(92,88,79,0.25)',
+    innerFace:'#f2efe8', innerRingStroke:'#ddd6c8',
+    progressArc:'rgba(61,79,170,0.5)',
+    handColor:'#3d4faa', handTip:'#5b6ee0',
+    centerNum:'#3a3f4d', centerLabel:'#7a766e',
   }
 };
 function examGetTheme(){
@@ -1559,7 +1574,7 @@ function examFinalizeEditEvent(id, name, dateMs, color){
 function examRenderEventList(){
   const list=document.getElementById('exam-eventList');
   if(examEvents.length===0){
-    list.innerHTML=`<div style="font-size:12px;color:#334155;text-align:center;padding:8px">${examL.noEvents}</div>`;
+    list.innerHTML=`<div style="font-size:12px;color:#4a4740;text-align:center;padding:8px">${examL.noEvents}</div>`;
     return;
   }
   const now=new Date(); now.setHours(0,0,0,0);
@@ -1711,10 +1726,10 @@ function examImportData(e){
 function examShareProgress(){
   const sizeMode = document.getElementById('exam-shareSizeSelect').value; // 'square' | 'story'
   const isLight = document.body.classList.contains('light-mode');
-  const bgColor = isLight ? '#f8fafc' : '#0a0b10';
-  const titleColor = '#6366f1';
-  const subColor = isLight ? '#475569' : '#94a3b8';
-  const footerColor = isLight ? '#cbd5e1' : '#334155';
+  const bgColor = isLight ? '#f2efe8' : '#1a1c22';
+  const titleColor = '#5b6ee0';
+  const subColor = isLight ? '#5c584f' : '#a8a49c';
+  const footerColor = isLight ? '#ddd6c8' : '#4a4740';
 
   const now = new Date();
   const dateStr = examL.dateLabel ? examL.dateLabel(now) : now.toLocaleDateString();
@@ -1743,22 +1758,22 @@ function examShareProgress(){
     tctx.drawImage(examCanvas, clockX, clockY, clockSize, clockSize);
 
     tctx.textAlign='center';
-    tctx.font='bold 48px "DM Mono", sans-serif';
+    tctx.font='bold 48px "Space Grotesk", sans-serif';
     tctx.fillStyle=titleColor;
     tctx.fillText(examPeriodName || 'Any Clock', W2/2, 140);
 
     const textY = clockY + clockSize + 90;
-    tctx.font='28px "DM Mono", sans-serif';
+    tctx.font='28px "Space Grotesk", sans-serif';
     tctx.fillStyle=subColor;
     tctx.fillText(dateStr, W2/2, textY);
 
     if(progressLine){
-      tctx.font='bold 34px "DM Mono", sans-serif';
+      tctx.font='bold 34px "Space Grotesk", sans-serif';
       tctx.fillStyle=titleColor;
       tctx.fillText(progressLine, W2/2, textY+54);
     }
 
-    tctx.font='20px "DM Mono", sans-serif';
+    tctx.font='20px "Space Grotesk", sans-serif';
     tctx.fillStyle=footerColor;
     tctx.fillText('Any Clock', W2/2, H2-60);
 
@@ -1772,22 +1787,22 @@ function examShareProgress(){
     tctx.drawImage(examCanvas, 0, extraTop);
 
     tctx.textAlign='center';
-    tctx.font='bold 30px "DM Mono", sans-serif';
+    tctx.font='bold 30px "Space Grotesk", sans-serif';
     tctx.fillStyle=titleColor;
     tctx.fillText(examPeriodName || 'Any Clock', tempCanvas.width/2, 48);
 
     const yBase = tempCanvas.height - extraBottom + 30;
-    tctx.font='18px "DM Mono", sans-serif';
+    tctx.font='18px "Space Grotesk", sans-serif';
     tctx.fillStyle=subColor;
     tctx.fillText(dateStr, tempCanvas.width/2, yBase);
 
     if(progressLine){
-      tctx.font='bold 20px "DM Mono", sans-serif';
+      tctx.font='bold 20px "Space Grotesk", sans-serif';
       tctx.fillStyle=titleColor;
       tctx.fillText(progressLine, tempCanvas.width/2, yBase+34);
     }
 
-    tctx.font='13px "DM Mono", sans-serif';
+    tctx.font='13px "Space Grotesk", sans-serif';
     tctx.fillStyle=footerColor;
     tctx.fillText('Any Clock', tempCanvas.width/2, yBase+70);
   }
@@ -1895,7 +1910,7 @@ function examDrawHand(deg,tipR,backR,width,color){
   const tx=examCX+tipR*Math.cos(a),ty=examCY+tipR*Math.sin(a);
   const bx=examCX-backR*Math.cos(a),by=examCY-backR*Math.sin(a);
   examCtx.save();
-  examCtx.shadowColor=color; examCtx.shadowBlur=20;
+  examCtx.shadowColor=color; examCtx.shadowBlur=0;
   examCtx.strokeStyle=color; examCtx.lineWidth=width; examCtx.lineCap='round';
   examCtx.beginPath(); examCtx.moveTo(bx,by); examCtx.lineTo(tx,ty); examCtx.stroke();
   examCtx.restore();
@@ -1973,26 +1988,13 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
     const endA=(segEndDeg-90)*Math.PI/180;
     const [rv,gv,bv]=examHexToRgb(ev.color);
 
+    // タイル状のベタ塗り（モザイクタイルの1ピースとして描く。グラデーションは使わない）
     examCtx.save();
     examCtx.beginPath();
     examCtx.arc(examCX,examCY,segOuter,startA,endA,false);
     examCtx.arc(examCX,examCY,segInner,endA,startA,true);
     examCtx.closePath();
-    examCtx.fillStyle=`rgba(${rv},${gv},${bv},0.26)`;
-    examCtx.fill();
-    examCtx.restore();
-
-    examCtx.save();
-    examCtx.beginPath();
-    examCtx.arc(examCX,examCY,segOuter,startA,endA,false);
-    examCtx.arc(examCX,examCY,segInner,endA,startA,true);
-    examCtx.closePath();
-    const grad=examCtx.createRadialGradient(examCX,examCY,segInner,examCX,examCY,segOuter);
-    grad.addColorStop(0,  `rgba(${rv},${gv},${bv},0.20)`);
-    grad.addColorStop(0.6,`rgba(${rv},${gv},${bv},0.50)`);
-    grad.addColorStop(1,  `rgba(${rv},${gv},${bv},0.75)`);
-    examCtx.fillStyle=grad;
-    examCtx.shadowColor=ev.color; examCtx.shadowBlur=14;
+    examCtx.fillStyle=`rgba(${rv},${gv},${bv},0.82)`;
     examCtx.fill();
     examCtx.restore();
 
@@ -2000,15 +2002,16 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
     examCtx.beginPath();
     examCtx.arc(examCX,examCY,segOuter,startA,endA);
     examCtx.strokeStyle=`rgba(${rv},${gv},${bv},0.9)`;
-    examCtx.lineWidth=3; examCtx.shadowColor=ev.color; examCtx.shadowBlur=12;
+    examCtx.lineWidth=3; examCtx.shadowColor=ev.color; examCtx.shadowBlur=0;
     examCtx.stroke();
     examCtx.restore();
 
+    // タイル同士の目地（区切り線）
     examCtx.save();
     const [bx1,by1]=examPolar(segOuter,segStartDeg);
     const [bx2,by2]=examPolar(segInner,segStartDeg);
     examCtx.beginPath(); examCtx.moveTo(bx1,by1); examCtx.lineTo(bx2,by2);
-    examCtx.strokeStyle='rgba(10,11,16,0.9)';
+    examCtx.strokeStyle='rgba(26,28,34,0.9)';
     examCtx.lineWidth=2.5; examCtx.stroke();
     examCtx.restore();
 
@@ -2024,7 +2027,7 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
       const fontSize=Math.max(13,Math.min(22,segSpan/5));
       const chipTheme=examGetTheme();
       examCtx.save();
-      examCtx.font=`bold ${fontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
+      examCtx.font=`bold ${fontSize}px "Space Grotesk","Noto Sans JP","Noto Sans KR",sans-serif`;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
       const maxC=Math.max(5,Math.floor(segSpan/6));
       const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
@@ -2048,7 +2051,7 @@ function examDrawMilestonesSegment(now, now0, nowDeg){
     const [emx,emy]=examPolar(midR,segEndDeg);
     examCtx.beginPath(); examCtx.arc(emx,emy,8,0,Math.PI*2);
     examCtx.fillStyle=`rgba(${rv},${gv},${bv},1)`;
-    examCtx.shadowColor=ev.color; examCtx.shadowBlur=18;
+    examCtx.shadowColor=ev.color; examCtx.shadowBlur=0;
     examCtx.fill();
     examCtx.beginPath(); examCtx.arc(emx,emy,3.5,0,Math.PI*2);
     examCtx.fillStyle='rgba(255,255,255,0.95)';
@@ -2094,26 +2097,13 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     const [rv,gv,bv]=examHexToRgb(ev.color);
     const isPast = ev.dateMs < now0.getTime();
 
+    // タイル状のベタ塗り（モザイクタイルの1ピースとして描く。グラデーションは使わない）
     examCtx.save();
     examCtx.beginPath();
     examCtx.arc(examCX,examCY,outerR,startA,endA,isPast);
     examCtx.arc(examCX,examCY,innerR,endA,startA,!isPast);
     examCtx.closePath();
-    examCtx.fillStyle=`rgba(${rv},${gv},${bv},${isPast?0.12:0.24})`;
-    examCtx.fill();
-    examCtx.restore();
-
-    examCtx.save();
-    examCtx.beginPath();
-    examCtx.arc(examCX,examCY,outerR,startA,endA,isPast);
-    examCtx.arc(examCX,examCY,innerR,endA,startA,!isPast);
-    examCtx.closePath();
-    const grad=examCtx.createRadialGradient(examCX,examCY,innerR,examCX,examCY,outerR);
-    grad.addColorStop(0,  `rgba(${rv},${gv},${bv},${isPast?0.08:0.20})`);
-    grad.addColorStop(0.6,`rgba(${rv},${gv},${bv},${isPast?0.18:0.48})`);
-    grad.addColorStop(1,  `rgba(${rv},${gv},${bv},${isPast?0.28:0.72})`);
-    examCtx.fillStyle=grad;
-    examCtx.shadowColor=ev.color; examCtx.shadowBlur=isPast?6:16;
+    examCtx.fillStyle=`rgba(${rv},${gv},${bv},${isPast?0.35:0.82})`;
     examCtx.fill();
     examCtx.restore();
 
@@ -2121,7 +2111,7 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     examCtx.beginPath();
     examCtx.arc(examCX,examCY,outerR,startA,endA,isPast);
     examCtx.strokeStyle=`rgba(${rv},${gv},${bv},${isPast?0.3:0.9})`;
-    examCtx.lineWidth=2.5; examCtx.shadowColor=ev.color; examCtx.shadowBlur=isPast?4:10;
+    examCtx.lineWidth=2.5; examCtx.shadowColor=ev.color; examCtx.shadowBlur=0;
     examCtx.stroke();
     examCtx.restore();
 
@@ -2130,7 +2120,7 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     const [lx,ly]=examPolar(midR,midDeg);
     const fontSize=Math.max(13,Math.min(20,ringH/3.2));
     examCtx.save();
-    examCtx.font=`bold ${fontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
+    examCtx.font=`bold ${fontSize}px "Space Grotesk","Noto Sans JP","Noto Sans KR",sans-serif`;
     examCtx.textAlign='center'; examCtx.textBaseline='middle';
     const maxC=Math.max(5,Math.floor(ringH/fontSize*2.4));
     const label=ev.name.length>maxC?ev.name.slice(0,maxC-1)+'…':ev.name;
@@ -2151,7 +2141,7 @@ function examDrawMilestonesRing(now, now0, nowDeg){
     const [emx,emy]=examPolar(midR,targetDeg);
     examCtx.beginPath(); examCtx.arc(emx,emy,8,0,Math.PI*2);
     examCtx.fillStyle=`rgba(${rv},${gv},${bv},${isPast?0.4:1})`;
-    examCtx.shadowColor=ev.color; examCtx.shadowBlur=isPast?6:18;
+    examCtx.shadowColor=ev.color; examCtx.shadowBlur=0;
     examCtx.fill();
     examCtx.beginPath(); examCtx.arc(emx,emy,3.5,0,Math.PI*2);
     examCtx.fillStyle=isPast?`rgba(${rv},${gv},${bv},0.5)`:'rgba(255,255,255,0.95)';
@@ -2217,9 +2207,9 @@ function examDraw(){
       const labelFontSize = isWeekView ? 16 : 20;
       const [lx,ly]=examPolar(labelR,deg);
       examCtx.save();
-      examCtx.font=`bold ${labelFontSize}px "DM Mono","Noto Sans JP","Noto Sans KR",sans-serif`;
+      examCtx.font=`bold ${labelFontSize}px "Space Grotesk","Noto Sans JP","Noto Sans KR",sans-serif`;
       examCtx.fillStyle=T.tickLabel;
-      examCtx.shadowColor=T.tickLabelGlow; examCtx.shadowBlur=6;
+      examCtx.shadowColor=T.tickLabelGlow; examCtx.shadowBlur=0;
       examCtx.textAlign='center'; examCtx.textBaseline='middle';
       let label;
       if(useMonthLabels){
@@ -2288,7 +2278,7 @@ function examDraw(){
     const [hx,hy]=examPolar(400,nowDeg);
     examCtx.beginPath(); examCtx.arc(hx,hy,9,0,Math.PI*2);
     examCtx.fillStyle=T.handTip;
-    examCtx.shadowColor=T.handColor; examCtx.shadowBlur=20;
+    examCtx.shadowColor=T.handColor; examCtx.shadowBlur=0;
     examCtx.fill(); examCtx.shadowBlur=0;
   }
 
@@ -2296,7 +2286,7 @@ function examDraw(){
   examCtx.beginPath(); examCtx.arc(examCX,examCY,22,0,Math.PI*2);
   examCtx.fillStyle=T.innerFace; examCtx.fill();
   examCtx.strokeStyle=T.handColor; examCtx.lineWidth=3;
-  examCtx.shadowColor=T.progressArc; examCtx.shadowBlur=8;
+  examCtx.shadowColor=T.progressArc; examCtx.shadowBlur=0;
   examCtx.stroke(); examCtx.shadowBlur=0;
   examCtx.beginPath(); examCtx.arc(examCX,examCY,9,0,Math.PI*2);
   examCtx.fillStyle=T.handTip; examCtx.fill();
